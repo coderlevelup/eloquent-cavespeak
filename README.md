@@ -124,14 +124,14 @@ Based on the viral observation that caveman-speak dramatically reduces LLM token
 
 ### Claude Code (recommended)
 
-Install as a plugin — includes skills + auto-loading hooks (caveman activates every session, mode badge tracks `/caveman ultra` etc.):
+Install as a plugin — includes skills + auto-loading hooks + statusline badge. Caveman activates every session, `[CAVEMAN:ULTRA]` badge tracks mode, Claude sets up the statusline on first session:
 
 ```bash
 claude plugin marketplace add JuliusBrussee/caveman
 claude plugin install caveman@caveman
 ```
 
-### Any agent (Claude Code, Cursor, Copilot, Windsurf, Cline, Codex)
+### Any agent (Claude Code, Cursor, Copilot, Windsurf, Cline, Codex, Gemini CLI, Antigravity)
 
 ```bash
 npx skills add JuliusBrussee/caveman
@@ -141,6 +141,7 @@ For a specific agent: `npx skills add JuliusBrussee/caveman -a cursor`
 
 > [!NOTE]
 > `npx skills` installs skills only (no hooks). For Claude Code auto-loading hooks, use the plugin install above or run `bash hooks/install.sh`.
+> Gemini CLI users can also install directly: `gemini extensions install https://github.com/JuliusBrussee/caveman`
 
 ### Codex
 
@@ -151,9 +152,13 @@ For a specific agent: `npx skills add JuliusBrussee/caveman -a cursor`
 
 Install once. Use in all sessions after that. One rock. That it.
 
-### Optional: Statusline Badge
+### Statusline Badge
 
-Add a `[CAVEMAN:ULTRA]` badge to your statusline showing which mode is active. See [`hooks/README.md`](hooks/README.md) for the snippet.
+The plugin ships a statusline script that shows `[CAVEMAN]`, `[CAVEMAN:ULTRA]`, etc. in your Claude Code status bar.
+
+- **Plugin install:** Claude offers to configure it on first session (auto-detected)
+- **Standalone install (`install.sh`):** Configured automatically
+- **Custom statusline:** See [`hooks/README.md`](hooks/README.md) for the snippet to add to your existing script
 
 ## Usage
 

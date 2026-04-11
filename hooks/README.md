@@ -11,6 +11,7 @@ If you installed caveman standalone (without the plugin), you can use `bash hook
 - Runs once when Claude Code starts
 - Writes `full` to `~/.claude/.caveman-active` (flag file)
 - Emits caveman rules as hidden SessionStart context
+- Detects missing statusline config and emits setup nudge (Claude will offer to help)
 
 ### `caveman-mode-tracker.js` — UserPromptSubmit hook
 
@@ -18,9 +19,33 @@ If you installed caveman standalone (without the plugin), you can use `bash hook
 - Writes the active mode to the flag file when a caveman command is detected
 - Supports: `full`, `lite`, `ultra`, `wenyan`, `wenyan-lite`, `wenyan-ultra`, `commit`, `review`, `compress`
 
-## Optional: Statusline Badge
+### `caveman-statusline.sh` — Statusline badge script
 
-The flag file bridges the gap between hooks (which Claude sees) and your statusline (which you see). Add this to your statusline script to show which mode is active:
+- Reads `~/.claude/.caveman-active` and outputs a colored badge
+- Shows `[CAVEMAN]`, `[CAVEMAN:ULTRA]`, `[CAVEMAN:WENYAN]`, etc.
+
+## Statusline Badge
+
+The statusline badge shows which caveman mode is active directly in your Claude Code status bar.
+
+**Plugin users:** On your first session after install, Claude will detect the missing statusline config and offer to set it up for you. Accept and you're done.
+
+**Standalone users:** `install.sh` wires the statusline automatically — no manual step needed.
+
+**Manual setup:** If you need to configure it yourself, add this to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bash /path/to/caveman-statusline.sh"
+  }
+}
+```
+
+Replace `/path/to/` with the actual path to the script (e.g. `~/.claude/hooks/` for standalone installs, or the plugin install directory for plugin installs).
+
+**Custom statusline:** If you already have a statusline script, add this snippet to it:
 
 ```bash
 caveman_text=""
@@ -28,10 +53,10 @@ caveman_flag="$HOME/.claude/.caveman-active"
 if [ -f "$caveman_flag" ]; then
   caveman_mode=$(cat "$caveman_flag" 2>/dev/null)
   if [ "$caveman_mode" = "full" ] || [ -z "$caveman_mode" ]; then
-    caveman_text="\033[38;5;172m[CAVEMAN]\033[0m"
+    caveman_text=$'\033[38;5;172m[CAVEMAN]\033[0m'
   else
     caveman_suffix=$(echo "$caveman_mode" | tr '[:lower:]' '[:upper:]')
-    caveman_text="\033[38;5;172m[CAVEMAN:${caveman_suffix}]\033[0m"
+    caveman_text=$'\033[38;5;172m[CAVEMAN:'"${caveman_suffix}"$']\033[0m'
   fi
 fi
 ```
@@ -61,6 +86,11 @@ SessionStart stdout is injected as hidden system context — Claude sees it, use
 If installed via plugin: disable the plugin — hooks deactivate automatically.
 
 If installed via `install.sh`:
-1. Remove `~/.claude/hooks/caveman-activate.js` and `~/.claude/hooks/caveman-mode-tracker.js`
-2. Remove the SessionStart and UserPromptSubmit entries from `~/.claude/settings.json`
+```bash
+bash hooks/uninstall.sh
+```
+
+Or manually:
+1. Remove `~/.claude/hooks/caveman-activate.js`, `~/.claude/hooks/caveman-mode-tracker.js`, and `~/.claude/hooks/caveman-statusline.sh`
+2. Remove the SessionStart, UserPromptSubmit, and statusLine entries from `~/.claude/settings.json`
 3. Delete `~/.claude/.caveman-active`

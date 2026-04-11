@@ -5,12 +5,20 @@
 #   or:  bash <(curl -s https://raw.githubusercontent.com/JuliusBrussee/caveman/main/hooks/install.sh)
 set -e
 
+# Require node — we use it to merge the hook config into settings.json
+if ! command -v node >/dev/null 2>&1; then
+  echo "ERROR: 'node' is required to install the caveman hooks (used to merge"
+  echo "       the hook config into ~/.claude/settings.json safely)."
+  echo "       Install Node.js from https://nodejs.org and re-run this script."
+  exit 1
+fi
+
 CLAUDE_DIR="$HOME/.claude"
 HOOKS_DIR="$CLAUDE_DIR/hooks"
 SETTINGS="$CLAUDE_DIR/settings.json"
 REPO_URL="https://raw.githubusercontent.com/JuliusBrussee/caveman/main/hooks"
 
-HOOK_FILES=("caveman-activate.js" "caveman-mode-tracker.js")
+HOOK_FILES=("caveman-activate.js" "caveman-mode-tracker.js" "caveman-statusline.sh")
 
 # Resolve source — works from repo clone or curl pipe
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}" 2>/dev/null)" 2>/dev/null && pwd)"
@@ -30,10 +38,16 @@ for hook in "${HOOK_FILES[@]}"; do
   echo "  Installed: $HOOKS_DIR/$hook"
 done
 
-# 3. Wire hooks into settings.json (idempotent)
+# Make statusline script executable
+chmod +x "$HOOKS_DIR/caveman-statusline.sh"
+
+# 3. Wire hooks + statusline into settings.json (idempotent)
 if [ ! -f "$SETTINGS" ]; then
   echo '{}' > "$SETTINGS"
 fi
+
+# Back up existing settings.json before touching it
+cp "$SETTINGS" "$SETTINGS.bak"
 
 node -e "
   const fs = require('fs');
@@ -72,9 +86,17 @@ node -e "
     });
   }
 
+  // Statusline — wire caveman badge (only if no statusLine is already configured)
+  if (!settings.statusLine) {
+    settings.statusLine = {
+      type: 'command',
+      command: 'bash $HOOKS_DIR/caveman-statusline.sh'
+    };
+  }
+
   fs.writeFileSync('$SETTINGS', JSON.stringify(settings, null, 2) + '\n');
 "
-echo "  Hooks wired in settings.json"
+echo "  Hooks + statusline wired in settings.json"
 
 echo ""
 echo "Done! Restart Claude Code to activate."
@@ -83,6 +105,4 @@ echo "What's installed:"
 echo "  - SessionStart hook: auto-loads caveman rules every session"
 echo "  - Mode tracker hook: updates statusline badge when you switch modes"
 echo "    (/caveman lite, /caveman ultra, /caveman-commit, etc.)"
-echo ""
-echo "Optional: Add a [CAVEMAN] badge to your statusline."
-echo "See: https://github.com/JuliusBrussee/caveman/blob/main/hooks/README.md"
+echo "  - Statusline badge: shows [CAVEMAN] or [CAVEMAN:ULTRA] etc."
