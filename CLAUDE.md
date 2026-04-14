@@ -35,6 +35,8 @@ Caveman makes AI coding agents respond in compressed caveman-style prose — cut
 | `skills/caveman-review/SKILL.md` | Caveman code review behavior. Fully independent skill. |
 | `skills/caveman-help/SKILL.md` | Quick-reference card. One-shot display, not a persistent mode. |
 | `caveman-compress/SKILL.md` | Compress sub-skill behavior. |
+| `skills/cavespeak/SKILL.md` | Cavespeak compression-only skill. Activates compressed prose mode for the session. |
+| `skills/eloquent-cavespeak/SKILL.md` | Eloquent-cavespeak two-layer pipeline skill. Starts local Gemma proxy that rehydrates cavespeak output into polished prose. |
 
 ### Auto-generated / auto-synced — do not edit directly
 
