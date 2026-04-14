@@ -1,0 +1,12 @@
+{
+  "name": "eloquent-cavespeak",
+  "version": "1.0.0",
+  "description": "Claude speaks cavespeak. Gemma rehydrates. You read prose.",
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
