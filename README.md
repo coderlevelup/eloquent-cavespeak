@@ -32,19 +32,28 @@ Claude compresses internally. Gemma translates back to English. Tool calls — f
 
 ## Setup
 
+**Prerequisites:** Node.js 18+, [Ollama](https://ollama.com)
+
 ```bash
-brew install ollama
-ollama pull gemma4:latest
-node proxy.js   # or: npm start
+# 1. Install Ollama
+brew install ollama   # or: https://ollama.com/download
+
+# 2. Install the skills into Claude Code
+npx skills add coderlevelup/eloquent-cavespeak
+
+# 3. Clone and install dependencies
+git clone https://github.com/coderlevelup/eloquent-cavespeak
+cd eloquent-cavespeak
+npm install
 ```
 
-Then in Claude Code:
+Then in Claude Code, run the skill — it handles starting the proxy, checking Ollama, and pulling the model automatically:
 
 ```
 /skill eloquent-cavespeak
 ```
 
-The skill handles checking Ollama, pulling the model if needed, starting the proxy, and setting `ANTHROPIC_BASE_URL`.
+Follow the prompt it returns to restart Claude Code with `ANTHROPIC_BASE_URL=http://localhost:3000`.
 
 ---
 
